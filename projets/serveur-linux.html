@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Serveur Debian LAMP — Dimitri C. | BTS SIO SISR</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand"><span class="brand-mark">DC</span><span>Dimitri C. — SISR</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Accueil</a></li>
+      <li><a href="../about.html">À propos</a></li>
+      <li><a href="../competences.html">Compétences</a></li>
+      <li><a href="../projets.html">Projets</a></li>
+      <li><a href="../veille.html">Veille techno</a></li>
+      <li><a href="../e4.html">Épreuve E4</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="breadcrumb">
+        <a href="../index.html">Accueil</a> <span>/</span>
+        <a href="../projets.html">Projets</a> <span>/</span>
+        <span>Debian LAMP</span>
+      </div>
+      <div class="eyebrow">Situation professionnelle · Home-lab</div>
+      <h1>Installation et durcissement<br/>d'un serveur web LAMP sur Debian 12.</h1>
+      <p style="max-width: 70ch; font-size: 1.05rem;">Déploiement d'un serveur web LAMP (Linux, Apache, MariaDB, PHP) sur Debian 12, avec certificat HTTPS Let's Encrypt, SSH par clé uniquement, fail2ban et UFW. Support d'un site interne WordPress.</p>
+
+      <div class="meta-row">
+        <div class="meta"><span class="meta-label">Durée</span><span class="meta-value">1 semaine</span></div><div class="meta"><span class="meta-label">Contexte</span><span class="meta-value">Home-lab</span></div><div class="meta"><span class="meta-label">Environnement</span><span class="meta-value">Debian 12 · Apache 2.4</span></div><div class="meta"><span class="meta-label">Bloc</span><span class="meta-value">Bloc 1 · Bloc 2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid" style="grid-template-columns: minmax(0,1fr) 280px; gap: 48px; align-items: start;">
+      <article class="prose reveal">
+        
+<h2>1. Contexte</h2>
+<p>Pour héberger l'intranet de <strong>TechnoServices</strong>, j'ai monté un serveur web <em>from scratch</em>. L'objectif n'était pas juste «&nbsp;que ça marche&nbsp;» mais «&nbsp;que ça tienne en production&nbsp;»&nbsp;: performances, sauvegarde, sécurité.</p>
+
+<h2>2. Installation de base</h2>
+
+<div class="code-block">
+<span class="c"># Mise à jour système</span>
+<span class="p">$</span> sudo apt update && sudo apt upgrade -y
+
+<span class="c"># Installation de la stack LAMP</span>
+<span class="p">$</span> sudo apt install apache2 mariadb-server \
+     php php-mysql php-curl php-gd php-mbstring \
+     libapache2-mod-php unzip -y
+
+<span class="c"># Sécurisation MariaDB (step interactif)</span>
+<span class="p">$</span> sudo mysql_secure_installation
+</div>
+
+<h2>3. Configuration d'un virtualhost</h2>
+
+<div class="code-block">
+<span class="c"># /etc/apache2/sites-available/intranet.conf</span>
+<span class="k">&lt;VirtualHost</span> *:80<span class="k">&gt;</span>
+    ServerName intranet.techno.local
+    DocumentRoot /var/www/intranet
+    ErrorLog  ${APACHE_LOG_DIR}/intranet-error.log
+    CustomLog ${APACHE_LOG_DIR}/intranet-access.log combined
+
+    <span class="k">&lt;Directory</span> /var/www/intranet<span class="k">&gt;</span>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    <span class="k">&lt;/Directory&gt;</span>
+<span class="k">&lt;/VirtualHost&gt;</span>
+</div>
+
+<div class="code-block">
+<span class="p">$</span> sudo a2ensite intranet
+<span class="p">$</span> sudo a2enmod rewrite headers ssl
+<span class="p">$</span> sudo systemctl reload apache2
+</div>
+
+<h2>4. HTTPS avec Let's Encrypt</h2>
+
+<div class="code-block">
+<span class="p">$</span> sudo apt install certbot python3-certbot-apache -y
+<span class="p">$</span> sudo certbot --apache -d intranet.techno.fr --redirect --email admin@techno.fr --agree-tos
+</div>
+
+<p>Certbot configure automatiquement le vhost en HTTPS, redirige tout le 80 vers le 443 et crée un <em>cron</em> de renouvellement. Je vérifie avec <code>https://www.ssllabs.com/ssltest/</code> → note A.</p>
+
+<h2>5. Durcissement SSH</h2>
+
+<p>Par défaut, SSH accepte les mots de passe. Pour éviter le brute-force, je passe en <strong>authentification par clé uniquement</strong>&nbsp;:</p>
+
+<div class="code-block">
+<span class="c"># Sur mon poste, génération de la clé (si pas déjà fait)</span>
+<span class="p">$</span> ssh-keygen -t ed25519 -C "dimitri@portfolio"
+
+<span class="c"># Copie sur le serveur</span>
+<span class="p">$</span> ssh-copy-id dimitri@srv01
+
+<span class="c"># Sur le serveur : /etc/ssh/sshd_config</span>
+PasswordAuthentication no
+PermitRootLogin no
+Port 2222
+AllowUsers dimitri
+</div>
+
+<div class="code-block">
+<span class="p">$</span> sudo systemctl restart ssh
+</div>
+
+<h2>6. Pare-feu UFW + fail2ban</h2>
+
+<div class="code-block">
+<span class="p">$</span> sudo apt install ufw fail2ban -y
+
+<span class="p">$</span> sudo ufw default deny incoming
+<span class="p">$</span> sudo ufw default allow outgoing
+<span class="p">$</span> sudo ufw allow 2222/tcp   <span class="c"># SSH (port custom)</span>
+<span class="p">$</span> sudo ufw allow 80/tcp
+<span class="p">$</span> sudo ufw allow 443/tcp
+<span class="p">$</span> sudo ufw enable
+</div>
+
+<p><strong>fail2ban</strong> surveille <code>/var/log/auth.log</code>&nbsp;: 3 échecs de connexion SSH en 10 minutes → IP bannie 1h. Même protection pour Apache via la jail <code>apache-auth</code>.</p>
+
+<h2>7. Sauvegardes</h2>
+
+<p>Un script Bash en cron quotidien (02:00)&nbsp;:</p>
+
+<div class="code-block">
+<span class="c">#!/bin/bash
+# backup.sh — sauvegarde intranet + BDD</span>
+DATE=<span class="k">$</span>(date +%Y-%m-%d)
+DEST=/srv/backup
+mkdir -p <span class="k">$DEST</span>
+
+<span class="c"># Archive du DocumentRoot</span>
+tar -czf <span class="k">$DEST</span>/intranet-<span class="k">$DATE</span>.tar.gz /var/www/intranet
+
+<span class="c"># Dump BDD</span>
+mysqldump --single-transaction --all-databases | gzip &gt; <span class="k">$DEST</span>/db-<span class="k">$DATE</span>.sql.gz
+
+<span class="c"># Rotation 7 jours</span>
+find <span class="k">$DEST</span> -type f -mtime +7 -delete
+
+<span class="c"># Envoi distant (NAS via rsync/SSH)</span>
+rsync -az <span class="k">$DEST</span>/ backup@nas.techno.local:/backup/srv01/
+</div>
+
+<div class="note-box warn">
+  <strong>Attention</strong> — un backup non testé n'est pas un backup. Une fois par mois, je restaure l'archive sur une VM de test pour vérifier que le dump SQL est bien exploitable.
+</div>
+
+<h2>8. Compétences BTS</h2>
+<div class="cc-map">
+  <div class="cc-chip"><span class="num">B1.1</span><span>Sauvegardes et continuité de service</span></div>
+  <div class="cc-chip"><span class="num">B1.3</span><span>Développer la présence en ligne</span></div>
+  <div class="cc-chip"><span class="num">B2.2</span><span>Installer et déployer une solution</span></div>
+  <div class="cc-chip"><span class="num">B2.3</span><span>Exploiter et maintenir une solution</span></div>
+</div>
+
+
+        <div class="btn-row mt-4">
+          <a href="glpi.html" class="btn btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Projet précédent
+          </a><a href="../projets.html" class="btn btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Tous les projets</a><a href="sauvegarde-veeam.html" class="btn btn-primary">
+            Projet suivant : Veeam
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <aside class="reveal">
+        <div class="card" style="position: sticky; top: 100px;">
+          <h4 style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-dim); margin: 0 0 14px;">Fiche projet</h4>
+<dl style="display: grid; gap: 14px; margin: 0; font-size: 0.92rem;">
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Technos</dt>
+    <dd style="margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px;"><span class="tag">Debian 12</span><span class="tag">Apache 2.4</span><span class="tag">MariaDB</span><span class="tag">PHP 8.2</span><span class="tag">Let's Encrypt</span><span class="tag">UFW</span><span class="tag">fail2ban</span></dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Livrables</dt>
+    <dd style="margin: 4px 0 0;">
+      <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.8;"><li>Procédure complète</li><li>Config Apache (vhost)</li><li>Script backup.sh</li><li>Rapport SSLLabs</li></ul>
+    </dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Compétences</dt>
+    <dd style="margin: 4px 0 0; color: var(--text); font-size: 0.9rem;">B1.1 · B1.3 · B2.2 · B2.3</dd>
+  </div>
+</dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;"><span class="brand-mark">DC</span><span>Dimitri C.</span></div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio BTS SIO SISR · E4 & E6. Session 2026.</p>
+      </div>
+      <div><h4>Navigation</h4><ul>
+        <li><a href="../about.html">À propos</a></li>
+        <li><a href="../competences.html">Compétences</a></li>
+        <li><a href="../projets.html">Projets</a></li>
+        <li><a href="../veille.html">Veille</a></li>
+      </ul></div>
+      <div><h4>Ressources</h4><ul>
+        <li><a href="../e4.html">Tableau de synthèse E4</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Dimitri C.</span><span>BTS SIO SISR · Session 2026</span></div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>

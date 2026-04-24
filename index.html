@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dimitri C. — Portfolio BTS SIO SISR</title>
+  <meta name="description" content="Portfolio de Dimitri C., étudiant en 2e année de BTS SIO option SISR. Projets d'infrastructure, systèmes et réseaux : Active Directory, pfSense, GLPI, VLAN, supervision, serveurs Linux." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">DC</span>
+      <span>Dimitri C. — SISR</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="about.html">À propos</a></li>
+      <li><a href="competences.html">Compétences</a></li>
+      <li><a href="projets.html">Projets</a></li>
+      <li><a href="veille.html">Veille techno</a></li>
+      <li><a href="e4.html">Épreuve E4</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Ouvrir le menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <div class="eyebrow">BTS SIO · Option SISR · Promo 2024–2026</div>
+      <h1>
+        Administrer, <span class="accent">sécuriser</span> et superviser<br/>
+        les infrastructures d'aujourd'hui.
+      </h1>
+      <p class="hero-lede">
+        Je m'appelle <strong>Dimitri</strong>, étudiant en deuxième année de BTS Services Informatiques aux Organisations, option
+        <strong>Solutions d'Infrastructure, Systèmes et Réseaux</strong>. Ce portfolio rassemble mes projets, mes stages
+        et les compétences acquises dans l'administration système, les réseaux d'entreprise et la cybersécurité.
+      </p>
+      <div class="btn-row">
+        <a href="projets.html" class="btn btn-primary">
+          Découvrir mes projets
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="assets/documents/CV-Dimitri-C.pdf" class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Télécharger mon CV
+        </a>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">6+</div>
+          <div class="stat-label">projets techniques</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">10 sem.</div>
+          <div class="stat-label">stages en entreprise</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">9</div>
+          <div class="stat-label">compétences BTS couvertes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-card reveal">
+      <div class="hero-terminal">
+        <div class="terminal-bar"><span></span><span></span><span></span></div>
+        <div data-terminal data-lines='[
+          "# whoami — Dimitri C., étudiant BTS SIO SISR",
+          "$ ssh dimitri@lab.local",
+          "= Authentification par clé RSA 4096 OK",
+          "$ cat /etc/skills",
+          "Windows Server 2022 · Active Directory · GPO",
+          "Debian · Ubuntu · Apache · MySQL · LAMP",
+          "Cisco IOS · VLAN · Trunk · OSPF · NAT",
+          "pfSense · OpenVPN · WireGuard · ACL",
+          "Zabbix · GLPI · FOG · Veeam Backup",
+          "PowerShell · Bash · Ansible · Docker",
+          "$ exit",
+          "# Bienvenue sur mon portfolio."
+        ]'>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMISES / "Ce que je sais faire" -->
+<section class="section">
+  <div class="container">
+    <div class="reveal">
+      <div class="eyebrow">Domaines de compétence</div>
+      <h2>Quatre piliers techniques</h2>
+      <p class="text-muted" style="max-width: 65ch;">
+        Au-delà de la théorie, chaque compétence affichée ici est illustrée par une réalisation documentée dans mon portfolio :
+        schémas d'architecture, procédures pas-à-pas, captures d'écran et scripts de configuration.
+      </p>
+    </div>
+
+    <div class="grid grid-3 mt-4">
+      <div class="card reveal">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3>Systèmes & annuaires</h3>
+        <p>Windows Server 2019/2022, Active Directory, GPO, DNS, DHCP, WSUS, déploiement automatisé (FOG).</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3>Réseaux d'entreprise</h3>
+        <p>Segmentation VLAN, trunk 802.1Q, routage inter-VLAN, ACL, NAT, configuration Cisco (IOS).</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Cybersécurité</h3>
+        <p>Pare-feu pfSense, VPN site-à-site et nomade, durcissement Linux, sauvegarde et PRA, gestion des droits AD.</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
+        </div>
+        <h3>Supervision & ITSM</h3>
+        <p>Déploiement Zabbix, alertes multi-canal, gestion d'incidents via GLPI, inventaire parc automatisé.</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>Scripting & automatisation</h3>
+        <p>Scripts PowerShell (création massive d'utilisateurs AD), Bash (déploiement LAMP), principes d'Ansible.</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>Qualité de service</h3>
+        <p>Rédaction de procédures, documentation technique, communication utilisateur, travail en mode projet.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PROJECTS -->
+<section class="section" style="background: var(--bg-elev);">
+  <div class="container">
+    <div class="reveal flex flex-wrap items-center" style="justify-content: space-between; gap: 20px;">
+      <div>
+        <div class="eyebrow">Réalisations sélectionnées</div>
+        <h2>Quelques projets phares</h2>
+      </div>
+      <a href="projets.html" class="btn btn-ghost">
+        Tous les projets
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-3 mt-4">
+      <a class="project-card reveal" href="projets/active-directory.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">AD&nbsp;DS</div>
+          <div class="project-thumb-sub">Windows Server 2022</div>
+        </div>
+        <div class="project-body">
+          <h3>Active Directory & GPO</h3>
+          <p class="text-muted">Mise en place d'un domaine, d'une forêt à un site, gestion centralisée par stratégies de groupe et scripts PowerShell.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Windows Server</span>
+            <span class="tag">DNS</span>
+            <span class="tag">GPO</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="projets/pfsense.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">pfSense</div>
+          <div class="project-thumb-sub">Pare-feu open source</div>
+        </div>
+        <div class="project-body">
+          <h3>Pare-feu pfSense & VPN</h3>
+          <p class="text-muted">Segmentation DMZ/LAN, règles de filtrage, VPN OpenVPN pour accès nomade, certificats X.509.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">pfSense</span>
+            <span class="tag">VPN</span>
+            <span class="tag">Sécurité</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="projets/vlan-cisco.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">VLAN</div>
+          <div class="project-thumb-sub">Cisco Packet Tracer</div>
+        </div>
+        <div class="project-body">
+          <h3>Segmentation VLAN Cisco</h3>
+          <p class="text-muted">Conception d'un réseau à 4 VLAN (admin, prod, invité, voix), routage inter-VLAN et ACL.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Cisco IOS</span>
+            <span class="tag">802.1Q</span>
+            <span class="tag">Routage</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="container" style="text-align: center; max-width: 720px;">
+    <div class="reveal">
+      <div class="eyebrow" style="justify-content: center;">Alternance / stage / emploi</div>
+      <h2>Envie d'échanger&nbsp;?</h2>
+      <p style="font-size: 1.05rem;">Je suis ouvert aux opportunités de poursuite d'études en alternance ou en emploi dans l'administration systèmes &amp; réseaux et la cybersécurité en Île-de-France.</p>
+      <div class="btn-row" style="justify-content: center;">
+        <a href="contact.html" class="btn btn-primary">
+          Me contacter
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16v16H4z"/><polyline points="22 6 12 13 2 6"/></svg>
+        </a>
+        <a href="e4.html" class="btn btn-ghost">Page épreuve E4</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;">
+          <span class="brand-mark">DC</span>
+          <span>Dimitri C.</span>
+        </div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio réalisé dans le cadre du BTS SIO – Option SISR, épreuves E4 &amp; E6. Session 2026.</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="about.html">À propos</a></li>
+          <li><a href="competences.html">Compétences</a></li>
+          <li><a href="projets.html">Projets</a></li>
+          <li><a href="veille.html">Veille technologique</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="e4.html">Tableau de synthèse E4</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="assets/documents/CV-Dimitri-C.pdf">Télécharger mon CV</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy">
+      <span>© 2026 Dimitri C. — Tous droits réservés.</span>
+      <span>Conçu avec HTML · CSS · un peu de caféine ☕</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

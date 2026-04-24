@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projets — Dimitri C. | BTS SIO SISR</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">DC</span><span>Dimitri C. — SISR</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="about.html">À propos</a></li>
+      <li><a href="competences.html">Compétences</a></li>
+      <li><a href="projets.html">Projets</a></li>
+      <li><a href="veille.html">Veille techno</a></li>
+      <li><a href="e4.html">Épreuve E4</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="eyebrow">Situations professionnelles</div>
+      <h1>Mes projets BTS SIO.</h1>
+      <p style="max-width: 72ch; font-size: 1.05rem;">Chaque projet ci-dessous a été mené soit en atelier de professionnalisation, soit en stage, soit dans mon home-lab personnel.
+      Tous sont documentés avec un <strong>contexte</strong>, une <strong>architecture</strong>, les <strong>étapes techniques</strong> et un retour sur les <strong>compétences mobilisées</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="grid grid-3 reveal">
+      <!-- Projet 1 : AD -->
+      <a class="project-card" href="projets/active-directory.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">AD&nbsp;DS</div>
+          <div class="project-thumb-sub">Windows Server 2022</div>
+        </div>
+        <div class="project-body">
+          <h3>Active Directory &amp; GPO</h3>
+          <p class="text-muted">Déploiement d'un domaine, d'un contrôleur de domaine et d'OU structurées, stratégies de groupe, scripts PowerShell.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Windows Server 2022</span>
+            <span class="tag">DNS</span>
+            <span class="tag">GPO</span>
+            <span class="tag">PowerShell</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Projet 2 : pfSense -->
+      <a class="project-card" href="projets/pfsense.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">pfSense</div>
+          <div class="project-thumb-sub">Firewall open source</div>
+        </div>
+        <div class="project-body">
+          <h3>Pare-feu pfSense &amp; VPN</h3>
+          <p class="text-muted">Architecture LAN/WAN/DMZ, règles de filtrage, VPN OpenVPN nomade, certificats, journalisation.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">pfSense</span>
+            <span class="tag">OpenVPN</span>
+            <span class="tag">DMZ</span>
+            <span class="tag">Sécurité</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Projet 3 : VLAN -->
+      <a class="project-card" href="projets/vlan-cisco.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">VLAN</div>
+          <div class="project-thumb-sub">Cisco Packet Tracer</div>
+        </div>
+        <div class="project-body">
+          <h3>Segmentation VLAN Cisco</h3>
+          <p class="text-muted">Réseau d'entreprise fictif avec 4 VLAN (admin, prod, invité, voix), trunking 802.1Q, routage inter-VLAN et ACL.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Cisco IOS</span>
+            <span class="tag">802.1Q</span>
+            <span class="tag">Inter-VLAN</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Projet 4 : Zabbix -->
+      <a class="project-card" href="projets/supervision-zabbix.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">Zabbix</div>
+          <div class="project-thumb-sub">Supervision 24/7</div>
+        </div>
+        <div class="project-body">
+          <h3>Supervision Zabbix</h3>
+          <p class="text-muted">Déploiement d'un serveur Zabbix 6, supervision de serveurs Windows/Linux et d'équipements SNMP, alertes e-mail.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Zabbix 6</span>
+            <span class="tag">SNMP</span>
+            <span class="tag">Debian</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Projet 5 : GLPI -->
+      <a class="project-card" href="projets/glpi.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">GLPI</div>
+          <div class="project-thumb-sub">Helpdesk + inventaire</div>
+        </div>
+        <div class="project-body">
+          <h3>GLPI : inventaire &amp; tickets</h3>
+          <p class="text-muted">Mise en production de GLPI 10 + FusionInventory pour gérer le parc et les tickets niveau 1/2.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">GLPI 10</span>
+            <span class="tag">ITIL</span>
+            <span class="tag">MariaDB</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Projet 6 : LAMP -->
+      <a class="project-card" href="projets/serveur-linux.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">LAMP</div>
+          <div class="project-thumb-sub">Debian · Apache · MariaDB</div>
+        </div>
+        <div class="project-body">
+          <h3>Serveur web Debian LAMP</h3>
+          <p class="text-muted">Installation et durcissement d'un serveur Debian 12 avec Apache, MariaDB, PHP, HTTPS (Let's Encrypt) et SSH par clé.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Debian 12</span>
+            <span class="tag">Apache</span>
+            <span class="tag">MariaDB</span>
+            <span class="tag">HTTPS</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Projet 7 : Veeam -->
+      <a class="project-card" href="projets/sauvegarde-veeam.html">
+        <div class="project-thumb">
+          <div class="project-thumb-label">PRA</div>
+          <div class="project-thumb-sub">Veeam Backup &amp; Replication</div>
+        </div>
+        <div class="project-body">
+          <h3>Sauvegarde &amp; PRA Veeam</h3>
+          <p class="text-muted">Mise en place d'une stratégie 3-2-1, sauvegardes quotidiennes de VM et tests de restauration réguliers.</p>
+          <div class="project-tags">
+            <span class="tag tag-accent">Veeam</span>
+            <span class="tag">3-2-1</span>
+            <span class="tag">PRA</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;"><span class="brand-mark">DC</span><span>Dimitri C.</span></div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio BTS SIO SISR · E4 & E6. Session 2026.</p>
+      </div>
+      <div><h4>Navigation</h4><ul>
+        <li><a href="about.html">À propos</a></li>
+        <li><a href="competences.html">Compétences</a></li>
+        <li><a href="projets.html">Projets</a></li>
+        <li><a href="veille.html">Veille</a></li>
+      </ul></div>
+      <div><h4>Ressources</h4><ul>
+        <li><a href="e4.html">Tableau de synthèse E4</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Dimitri C.</span><span>BTS SIO SISR · Session 2026</span></div>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+</body>
+</html>

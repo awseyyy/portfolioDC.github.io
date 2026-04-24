@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GLPI : helpdesk & inventaire — Dimitri C. | BTS SIO SISR</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand"><span class="brand-mark">DC</span><span>Dimitri C. — SISR</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Accueil</a></li>
+      <li><a href="../about.html">À propos</a></li>
+      <li><a href="../competences.html">Compétences</a></li>
+      <li><a href="../projets.html">Projets</a></li>
+      <li><a href="../veille.html">Veille techno</a></li>
+      <li><a href="../e4.html">Épreuve E4</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="breadcrumb">
+        <a href="../index.html">Accueil</a> <span>/</span>
+        <a href="../projets.html">Projets</a> <span>/</span>
+        <span>GLPI</span>
+      </div>
+      <div class="eyebrow">Situation professionnelle · Stage 1</div>
+      <h1>Helpdesk et inventaire<br/>centralisés avec GLPI 10.</h1>
+      <p style="max-width: 70ch; font-size: 1.05rem;">Mise en production d'une instance GLPI 10 avec FusionInventory pour gérer à la fois le parc informatique (50+ équipements) et les tickets d'assistance niveaux 1 et 2 d'une PME.</p>
+
+      <div class="meta-row">
+        <div class="meta"><span class="meta-label">Durée</span><span class="meta-value">2 semaines (stage)</span></div><div class="meta"><span class="meta-label">Contexte</span><span class="meta-value">Stage 1</span></div><div class="meta"><span class="meta-label">Environnement</span><span class="meta-value">Debian 12 · GLPI 10</span></div><div class="meta"><span class="meta-label">Bloc</span><span class="meta-value">Bloc 1</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid" style="grid-template-columns: minmax(0,1fr) 280px; gap: 48px; align-items: start;">
+      <article class="prose reveal">
+        
+<h2>1. Contexte</h2>
+<p>Chez <strong>TechnoServices</strong> (stage 1), le support IT fonctionnait avec des e-mails et un vieux tableur Excel pour l'inventaire. Résultat&nbsp;: doublons, tickets oubliés, aucun suivi d'historique matériel. J'ai proposé la mise en place de <strong>GLPI 10</strong>, la solution open source leader en France pour l'ITSM.</p>
+
+<h2>2. Architecture</h2>
+
+<div class="ascii-schema">
+  ┌───────────────────────────┐
+  │  Postes clients (Win)     │
+  │  + agent FusionInventory  │
+  └────────────┬──────────────┘
+               │ HTTPS
+               ▼
+  ┌───────────────────────────┐
+  │    GLPI01 · Debian 12     │
+  │  ┌─────────┐  ┌────────┐  │
+  │  │ Apache  │  │ GLPI   │  │
+  │  │  PHP    │──│  10    │  │
+  │  └─────────┘  └───┬────┘  │
+  │                   │       │
+  │            ┌──────▼─────┐ │
+  │            │  MariaDB   │ │
+  │            └────────────┘ │
+  └───────────────────────────┘
+</div>
+
+<h2>3. Installation</h2>
+
+<div class="code-block">
+<span class="c"># Stack LAMP</span>
+<span class="p">$</span> sudo apt install apache2 mariadb-server php php-mysql php-gd \
+     php-curl php-intl php-ldap php-xml php-zip php-bz2 php-mbstring -y
+
+<span class="c"># Base de données GLPI</span>
+<span class="p">$</span> sudo mysql
+<span class="k">mysql></span> CREATE DATABASE glpi;
+<span class="k">mysql></span> CREATE USER 'glpi'@'localhost' IDENTIFIED BY 'MotDePasseFort';
+<span class="k">mysql></span> GRANT ALL ON glpi.* TO 'glpi'@'localhost';
+
+<span class="c"># Téléchargement et déploiement</span>
+<span class="p">$</span> cd /tmp && wget https://github.com/glpi-project/glpi/releases/download/10.0.10/glpi-10.0.10.tgz
+<span class="p">$</span> sudo tar -xzf glpi-10.0.10.tgz -C /var/www/
+<span class="p">$</span> sudo chown -R www-data:www-data /var/www/glpi
+</div>
+
+<p>Puis passage dans l'assistant web pour finaliser la connexion à la base. <strong>Important</strong>&nbsp;: à la fin du wizard, on supprime <code>/var/www/glpi/install/install.php</code> et on active HTTPS (certificat Let's Encrypt).</p>
+
+<h2>4. Configuration</h2>
+
+<h3>4.1 — Entités</h3>
+<p>Une <em>entité racine</em> "TechnoServices" avec deux sous-entités&nbsp;: <strong>Paris</strong> et <strong>Lyon</strong>. Chaque technicien voit uniquement son site.</p>
+
+<h3>4.2 — Profils &amp; droits</h3>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Profil</th><th>Droits</th><th>Population</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Self-Service</strong></td><td>Créer / suivre ses tickets</td><td>Tous les employés</td></tr>
+      <tr><td><strong>Technicien N1</strong></td><td>Lire + assigner + résoudre</td><td>Support de 1er niveau</td></tr>
+      <tr><td><strong>Technicien N2</strong></td><td>N1 + modifier parc + CMDB</td><td>Admin systèmes</td></tr>
+      <tr><td><strong>Super-Admin</strong></td><td>Tout</td><td>2 comptes, stockés en coffre</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>4.3 — Synchro LDAP avec l'Active Directory</h3>
+<p>Plutôt que de recréer les comptes, j'ai configuré la <em>connexion LDAP</em> vers <code>DC01.techno.local</code> (port 389, binding par compte de service <code>svc_glpi</code>). Résultat&nbsp;: tous les utilisateurs du domaine peuvent se connecter à GLPI avec leurs identifiants Windows, aucun mot de passe à gérer.</p>
+
+<h2>5. FusionInventory (inventaire automatique)</h2>
+
+<h3>5.1 — Côté serveur</h3>
+<p>Installation du <strong>plugin FusionInventory for GLPI</strong> (fichier <code>.tar.bz2</code> à copier dans <code>/var/www/glpi/plugins</code>), puis activation dans l'UI.</p>
+
+<h3>5.2 — Côté client Windows</h3>
+<p>Installation silencieuse via GPO (cf. <a href="active-directory.html">projet AD</a>) de l'agent&nbsp;:</p>
+
+<div class="code-block">
+msiexec /i fusioninventory-agent_windows-x64_2.6.msi /quiet <span>`</span>
+    SERVER=https://glpi.techno.local/plugins/fusioninventory <span>`</span>
+    RUNNOW=1 ADD_FIREWALL_EXCEPTION=1
+</div>
+
+<p>Au prochain reboot, chaque poste apparaît automatiquement dans GLPI avec son matériel, ses logiciels installés, son numéro de série&hellip; un gain de temps spectaculaire par rapport à un inventaire Excel.</p>
+
+<h2>6. SLA &amp; règles métier</h2>
+
+<p>Pour les tickets, j'ai créé deux <strong>SLA</strong>&nbsp;:</p>
+<ul>
+  <li><strong>SLA-Critique</strong> : prise en charge sous 1h, résolution sous 4h. (Déclenchée par mot-clé «&nbsp;urgent&nbsp;» ou sur catégorie "Serveur").</li>
+  <li><strong>SLA-Standard</strong> : prise en charge sous 8h, résolution sous 5 jours.</li>
+</ul>
+
+<p>Des <em>règles métier</em> affectent automatiquement les tickets à la bonne file selon leur catégorie (Imprimante → équipe A, Réseau → équipe B, etc.).</p>
+
+<h2>7. Tableau de bord</h2>
+<p>Dans l'interface&nbsp;: vue globale des tickets en cours, temps moyen de résolution, taux de respect du SLA. J'ai exporté un rapport mensuel au format PDF pour le responsable.</p>
+
+<h2>8. Compétences BTS</h2>
+<div class="cc-map">
+  <div class="cc-chip"><span class="num">B1.1</span><span>Gérer le patrimoine informatique (inventaire)</span></div>
+  <div class="cc-chip"><span class="num">B1.2</span><span>Répondre aux demandes d'assistance</span></div>
+  <div class="cc-chip"><span class="num">B1.4</span><span>Travailler en mode projet</span></div>
+  <div class="cc-chip"><span class="num">B1.5</span><span>Mettre à disposition un service (procédure utilisateur)</span></div>
+</div>
+
+
+        <div class="btn-row mt-4">
+          <a href="supervision-zabbix.html" class="btn btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Projet précédent
+          </a><a href="../projets.html" class="btn btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Tous les projets</a><a href="serveur-linux.html" class="btn btn-primary">
+            Projet suivant : Debian LAMP
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <aside class="reveal">
+        <div class="card" style="position: sticky; top: 100px;">
+          <h4 style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-dim); margin: 0 0 14px;">Fiche projet</h4>
+<dl style="display: grid; gap: 14px; margin: 0; font-size: 0.92rem;">
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Technos</dt>
+    <dd style="margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px;"><span class="tag">GLPI 10</span><span class="tag">FusionInventory</span><span class="tag">MariaDB</span><span class="tag">LDAP</span><span class="tag">ITIL</span></dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Livrables</dt>
+    <dd style="margin: 4px 0 0;">
+      <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.8;"><li>Procédure d'installation</li><li>Schéma des entités</li><li>Script GPO agent</li><li>Rapport SLA mensuel</li></ul>
+    </dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Compétences</dt>
+    <dd style="margin: 4px 0 0; color: var(--text); font-size: 0.9rem;">B1.1 · B1.2 · B1.4 · B1.5</dd>
+  </div>
+</dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;"><span class="brand-mark">DC</span><span>Dimitri C.</span></div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio BTS SIO SISR · E4 & E6. Session 2026.</p>
+      </div>
+      <div><h4>Navigation</h4><ul>
+        <li><a href="../about.html">À propos</a></li>
+        <li><a href="../competences.html">Compétences</a></li>
+        <li><a href="../projets.html">Projets</a></li>
+        <li><a href="../veille.html">Veille</a></li>
+      </ul></div>
+      <div><h4>Ressources</h4><ul>
+        <li><a href="../e4.html">Tableau de synthèse E4</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Dimitri C.</span><span>BTS SIO SISR · Session 2026</span></div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>

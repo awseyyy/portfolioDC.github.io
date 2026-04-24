@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" role="img" aria-label="Architecture Active Directory">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0B1120" flood-opacity="0.25"/>
+    </filter>
+    <style>
+      .label  { font-family: 'JetBrains Mono', monospace; font-size: 12px; fill: #0B1120; font-weight: 600; }
+      .sub    { font-family: 'Manrope', sans-serif; font-size: 11px; fill: #475569; }
+      .title  { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; fill: #0B1120; font-weight: 700; }
+      .box    { fill: white; stroke: #CBD5E1; stroke-width: 1.5; }
+      .boxacc { fill: #F0F9FF; stroke: #38BDF8; stroke-width: 2; }
+      .link   { stroke: #64748B; stroke-width: 2; fill: none; stroke-dasharray: 6 4; }
+      .linkok { stroke: #38BDF8; stroke-width: 2.5; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="900" height="500" fill="#F8FAFC"/>
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" class="title">Architecture Active Directory — techno.local</text>
+  <text x="450" y="60" text-anchor="middle" class="sub">Domaine unique · Forêt monosite · 40 utilisateurs</text>
+
+  <!-- DC01 -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="110" width="200" height="100" rx="10" class="boxacc"/>
+    <text x="200" y="140" text-anchor="middle" class="title">🏛 DC01</text>
+    <text x="200" y="160" text-anchor="middle" class="label">Windows Server 2022</text>
+    <text x="200" y="180" text-anchor="middle" class="sub">AD DS + DNS + DHCP</text>
+    <text x="200" y="198" text-anchor="middle" class="sub">10.0.0.10</text>
+  </g>
+
+  <!-- FS01 -->
+  <g filter="url(#shadow)">
+    <rect x="350" y="110" width="200" height="100" rx="10" class="box"/>
+    <text x="450" y="140" text-anchor="middle" class="title">📁 FS01</text>
+    <text x="450" y="160" text-anchor="middle" class="label">Windows Server 2022</text>
+    <text x="450" y="180" text-anchor="middle" class="sub">Serveur de fichiers SMB</text>
+    <text x="450" y="198" text-anchor="middle" class="sub">10.0.0.20</text>
+  </g>
+
+  <!-- Gateway -->
+  <g filter="url(#shadow)">
+    <rect x="600" y="110" width="200" height="100" rx="10" class="box"/>
+    <text x="700" y="140" text-anchor="middle" class="title">🛡 pfSense</text>
+    <text x="700" y="160" text-anchor="middle" class="label">Pare-feu + VPN</text>
+    <text x="700" y="180" text-anchor="middle" class="sub">LAN / WAN / DMZ</text>
+    <text x="700" y="198" text-anchor="middle" class="sub">10.0.0.1</text>
+  </g>
+
+  <!-- Switch -->
+  <g filter="url(#shadow)">
+    <rect x="350" y="260" width="200" height="60" rx="8" fill="#0B1120"/>
+    <text x="450" y="285" text-anchor="middle" style="font-family:'JetBrains Mono'; font-size:13px; fill:white; font-weight:700;">⚡ SW-CORE (Cisco)</text>
+    <text x="450" y="303" text-anchor="middle" style="font-family:'Manrope'; font-size:10px; fill:#94A3B8;">trunk 802.1Q · VLAN 10/20/30/40</text>
+  </g>
+
+  <!-- Links top to switch -->
+  <path class="linkok" d="M200 210 L200 245 L440 245 L440 260"/>
+  <path class="linkok" d="M450 210 L450 260"/>
+  <path class="linkok" d="M700 210 L700 245 L460 245 L460 260"/>
+
+  <!-- Clients -->
+  <g filter="url(#shadow)">
+    <rect x="80" y="380" width="180" height="90" rx="10" class="box"/>
+    <text x="170" y="410" text-anchor="middle" class="title">💻 VLAN Direction</text>
+    <text x="170" y="428" text-anchor="middle" class="sub">4 postes · 10.0.10.x</text>
+    <text x="170" y="448" text-anchor="middle" class="label">OU=Direction</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="280" y="380" width="180" height="90" rx="10" class="box"/>
+    <text x="370" y="410" text-anchor="middle" class="title">💻 VLAN Compta</text>
+    <text x="370" y="428" text-anchor="middle" class="sub">6 postes · 10.0.20.x</text>
+    <text x="370" y="448" text-anchor="middle" class="label">OU=Compta</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="480" y="380" width="180" height="90" rx="10" class="box"/>
+    <text x="570" y="410" text-anchor="middle" class="title">💻 VLAN Production</text>
+    <text x="570" y="428" text-anchor="middle" class="sub">30 postes · 10.0.30.x</text>
+    <text x="570" y="448" text-anchor="middle" class="label">OU=Production</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="680" y="380" width="180" height="90" rx="10" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+    <text x="770" y="410" text-anchor="middle" class="title">👥 VLAN Invités</text>
+    <text x="770" y="428" text-anchor="middle" class="sub">Wi-Fi · isolé</text>
+    <text x="770" y="448" text-anchor="middle" style="font-family:'JetBrains Mono';font-size:11px;fill:#D97706;font-weight:600;">ACL : no LAN</text>
+  </g>
+
+  <!-- Links switch to VLAN -->
+  <path class="link" d="M400 320 L170 380"/>
+  <path class="link" d="M430 320 L370 380"/>
+  <path class="link" d="M470 320 L570 380"/>
+  <path class="link" d="M500 320 L770 380"/>
+
+  <!-- Internet bubble -->
+  <g>
+    <ellipse cx="700" cy="80" rx="60" ry="18" fill="#E0F2FE" stroke="#0EA5E9" stroke-width="1.5"/>
+    <text x="700" y="85" text-anchor="middle" style="font-family:'Bricolage Grotesque';font-size:13px;fill:#0369A1;font-weight:700;">🌐 Internet</text>
+  </g>
+  <path class="linkok" d="M700 98 L700 110"/>
+
+</svg>

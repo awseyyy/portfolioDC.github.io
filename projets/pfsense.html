@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pare-feu pfSense & VPN — Dimitri C. | BTS SIO SISR</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand"><span class="brand-mark">DC</span><span>Dimitri C. — SISR</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Accueil</a></li>
+      <li><a href="../about.html">À propos</a></li>
+      <li><a href="../competences.html">Compétences</a></li>
+      <li><a href="../projets.html">Projets</a></li>
+      <li><a href="../veille.html">Veille techno</a></li>
+      <li><a href="../e4.html">Épreuve E4</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="breadcrumb">
+        <a href="../index.html">Accueil</a> <span>/</span>
+        <a href="../projets.html">Projets</a> <span>/</span>
+        <span>pfSense & VPN</span>
+      </div>
+      <div class="eyebrow">Situation professionnelle · Atelier pro + Home-lab</div>
+      <h1>Pare-feu pfSense,<br/>DMZ et VPN nomade.</h1>
+      <p style="max-width: 70ch; font-size: 1.05rem;">Installation et configuration d'un pare-feu pfSense avec segmentation LAN/DMZ, règles de filtrage explicites et accès VPN distant sécurisé (OpenVPN + certificats X.509) pour le personnel en télétravail.</p>
+
+      <div class="meta-row">
+        <div class="meta"><span class="meta-label">Durée</span><span class="meta-value">2 semaines</span></div><div class="meta"><span class="meta-label">Contexte</span><span class="meta-value">Atelier pro · Home-lab</span></div><div class="meta"><span class="meta-label">Environnement</span><span class="meta-value">pfSense 2.7 CE</span></div><div class="meta"><span class="meta-label">Bloc</span><span class="meta-value">Bloc 2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid" style="grid-template-columns: minmax(0,1fr) 280px; gap: 48px; align-items: start;">
+      <article class="prose reveal">
+        
+<h2>1. Contexte &amp; besoin</h2>
+<p>Dans la continuité du projet Active Directory, l'entreprise fictive <strong>TechnoServices</strong> a besoin d'un pare-feu périmétrique pour&nbsp;:</p>
+<ul>
+  <li>Séparer le <strong>LAN interne</strong> (postes + serveurs) du <strong>WAN</strong> (internet).</li>
+  <li>Héberger un <strong>serveur web public</strong> en <strong>DMZ</strong>, accessible depuis internet mais isolé du LAN.</li>
+  <li>Permettre aux <strong>collaborateurs en télétravail</strong> d'accéder aux ressources internes via un <strong>VPN</strong>.</li>
+  <li>Filtrer strictement les flux (<em>default deny</em>) et <strong>journaliser</strong> les connexions suspectes.</li>
+</ul>
+
+<p>Le choix s'est porté sur <strong>pfSense CE 2.7</strong> pour son coût nul, son interface web complète et son écosystème de paquets (openvpn, pfBlockerNG, Suricata&hellip;).</p>
+
+<h2>2. Architecture réseau</h2>
+
+<div class="ascii-schema">
+            Internet (WAN)  ─ IP publique box
+                    │
+                    │  re0 (WAN)  192.0.2.5/24
+            ┌───────▼────────┐
+            │    pfSense     │  (routeur + firewall)
+            │   em0 em1 em2  │
+            └──┬──────┬──────┴─┐
+               │      │        │
+          LAN │   DMZ │    OPT │
+               │      │
+   10.0.0.0/24│      │ 10.0.10.0/24
+        Postes│      │  Serveur WEB01 (Apache)
+        AD    │      │
+        FS01  │      │
+</div>
+
+<p>Trois interfaces physiques (ou VLAN sur un switch)&nbsp;:</p>
+<ul>
+  <li><strong>WAN</strong> (em0) — DHCP depuis la box.</li>
+  <li><strong>LAN</strong> (em1) — 10.0.0.1/24, DHCP distribué aux postes.</li>
+  <li><strong>DMZ</strong> (em2) — 10.0.10.1/24, statique pour les serveurs publics.</li>
+</ul>
+
+<h2>3. Règles de filtrage (philosophie)</h2>
+
+<p>Le principe&nbsp;: <strong>tout est interdit, sauf ce qui est explicitement autorisé</strong>. Sur chaque interface, la <em>dernière règle</em> est implicitement «&nbsp;deny all&nbsp;», donc je n'ouvre que ce qui est vraiment nécessaire.</p>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Interface</th><th>Src</th><th>Dst</th><th>Port</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>LAN</td><td>LAN net</td><td>any</td><td>80,443,53</td><td style="color:var(--success);">ALLOW</td></tr>
+      <tr><td>LAN</td><td>LAN net</td><td>DMZ net</td><td>80,443</td><td style="color:var(--success);">ALLOW</td></tr>
+      <tr><td>LAN</td><td>LAN net</td><td>DMZ net</td><td>*</td><td style="color:var(--danger);">BLOCK</td></tr>
+      <tr><td>WAN</td><td>any</td><td>DMZ:WEB01</td><td>80,443</td><td style="color:var(--success);">ALLOW (NAT)</td></tr>
+      <tr><td>DMZ</td><td>DMZ net</td><td>LAN net</td><td>*</td><td style="color:var(--danger);">BLOCK</td></tr>
+      <tr><td>DMZ</td><td>DMZ net</td><td>any</td><td>80,443,53</td><td style="color:var(--success);">ALLOW (MAJ)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-box">
+  <strong>Pourquoi bloquer DMZ → LAN&nbsp;?</strong> Si un jour le serveur web est compromis, l'attaquant ne doit pas pouvoir «&nbsp;rebondir&nbsp;» vers l'Active Directory. C'est <em>le</em> bon réflexe sécurité d'une DMZ.
+</div>
+
+<h2>4. NAT (redirection de port)</h2>
+
+<p>Pour que le site public soit accessible depuis internet, j'ai créé un <strong>Port Forward</strong> dans Firewall → NAT → Port Forward&nbsp;:</p>
+
+<div class="code-block">
+<span class="c"># Interface : WAN
+# Protocole : TCP
+# Destination : WAN address
+# Dest. port : HTTP (80), HTTPS (443)
+# Redirect target IP : 10.0.10.10 (WEB01)
+# Redirect target port : 80 / 443</span>
+</div>
+
+<p>pfSense crée automatiquement la règle associée sur l'interface WAN. Je vérifie avec <code>Diagnostics → Packet Capture</code> qu'un client internet atteint bien WEB01.</p>
+
+<h2>5. VPN OpenVPN (accès nomade)</h2>
+
+<h3>5.1 — Préparation de l'autorité de certification</h3>
+<ol>
+  <li><strong>System → Cert. Manager → CAs</strong> → création d'une CA <code>VPN-TECHNO-CA</code> (RSA 2048, SHA-256).</li>
+  <li><strong>Certificates</strong> → certificat serveur <code>vpn-srv</code> signé par la CA.</li>
+  <li>Un certificat <em>utilisateur</em> par collaborateur nomade.</li>
+</ol>
+
+<h3>5.2 — Assistant OpenVPN</h3>
+<p>J'ai utilisé l'assistant (<code>VPN → OpenVPN → Wizards</code>) pour créer un serveur&nbsp;:</p>
+<ul>
+  <li>Mode&nbsp;: <code>Remote Access (SSL/TLS + User Auth)</code></li>
+  <li>Protocole&nbsp;: <code>UDP</code> sur port <code>1194</code></li>
+  <li>Réseau tunnel&nbsp;: <code>10.8.0.0/24</code></li>
+  <li>Réseaux poussés au client&nbsp;: <code>10.0.0.0/24</code> (LAN)</li>
+  <li>DNS poussé&nbsp;: <code>10.0.0.10</code> (DC01)</li>
+</ul>
+
+<h3>5.3 — Export du client</h3>
+<p>Grâce au paquet <strong>openvpn-client-export</strong>, je génère pour chaque utilisateur un installateur <em>.exe</em> ou un profil <em>.ovpn</em> qui embarque déjà la CA, le certif client et la clé. L'utilisateur n'a plus qu'à double-cliquer et saisir son identifiant AD (authentification combinée cert + login).</p>
+
+<h2>6. Tests</h2>
+<ul>
+  <li>Ping LAN → DMZ&nbsp;: refusé ✔</li>
+  <li>HTTP LAN → WEB01&nbsp;: OK ✔</li>
+  <li>Accès public au site depuis un téléphone en 4G&nbsp;: OK ✔</li>
+  <li>Connexion VPN depuis un réseau externe puis accès à un partage <code>\fs01\shares</code>&nbsp;: OK ✔</li>
+  <li>Test de filtrage&nbsp;: un client VPN essaie de pinger la box internet du siège → bloqué ✔</li>
+</ul>
+
+<h2>7. Compétences BTS mobilisées</h2>
+<div class="cc-map">
+  <div class="cc-chip"><span class="num">B1.1</span><span>Habilitations, sécurité des accès</span></div>
+  <div class="cc-chip"><span class="num">B2.1</span><span>Concevoir une solution d'infrastructure (DMZ, VPN)</span></div>
+  <div class="cc-chip"><span class="num">B2.2</span><span>Installer, tester et déployer</span></div>
+  <div class="cc-chip"><span class="num">B2.3</span><span>Exploiter et superviser (logs pare-feu)</span></div>
+</div>
+
+<h2>8. Bilan</h2>
+<p>pfSense m'a vraiment fait comprendre la logique des pare-feu modernes&nbsp;: <em>stateful inspection</em>, <em>default deny</em>, NAT sortant automatique, règles par interface. J'ai aussi appris à lire les logs <code>pf</code> pour expliquer pourquoi un flux est bloqué. La prochaine étape logique serait d'installer <strong>Suricata</strong> (IDS/IPS) sur l'interface WAN pour détecter les scans.</p>
+
+
+        <div class="btn-row mt-4">
+          <a href="active-directory.html" class="btn btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Projet précédent
+          </a><a href="../projets.html" class="btn btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Tous les projets</a><a href="vlan-cisco.html" class="btn btn-primary">
+            Projet suivant : VLAN Cisco
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <aside class="reveal">
+        <div class="card" style="position: sticky; top: 100px;">
+          <h4 style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-dim); margin: 0 0 14px;">Fiche projet</h4>
+<dl style="display: grid; gap: 14px; margin: 0; font-size: 0.92rem;">
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Technos</dt>
+    <dd style="margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px;"><span class="tag">pfSense 2.7</span><span class="tag">OpenVPN</span><span class="tag">X.509</span><span class="tag">NAT</span><span class="tag">Packet Capture</span></dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Livrables</dt>
+    <dd style="margin: 4px 0 0;">
+      <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.8;"><li>Schéma réseau DMZ</li><li>Tableau de règles</li><li>Procédure création CA</li><li>Fichier .ovpn client</li><li>Rapport de tests</li></ul>
+    </dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Compétences</dt>
+    <dd style="margin: 4px 0 0; color: var(--text); font-size: 0.9rem;">B1.1 · B2.1 · B2.2 · B2.3</dd>
+  </div>
+</dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;"><span class="brand-mark">DC</span><span>Dimitri C.</span></div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio BTS SIO SISR · E4 & E6. Session 2026.</p>
+      </div>
+      <div><h4>Navigation</h4><ul>
+        <li><a href="../about.html">À propos</a></li>
+        <li><a href="../competences.html">Compétences</a></li>
+        <li><a href="../projets.html">Projets</a></li>
+        <li><a href="../veille.html">Veille</a></li>
+      </ul></div>
+      <div><h4>Ressources</h4><ul>
+        <li><a href="../e4.html">Tableau de synthèse E4</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Dimitri C.</span><span>BTS SIO SISR · Session 2026</span></div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>

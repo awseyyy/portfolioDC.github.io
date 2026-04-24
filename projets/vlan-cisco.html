@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Segmentation VLAN Cisco — Dimitri C. | BTS SIO SISR</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand"><span class="brand-mark">DC</span><span>Dimitri C. — SISR</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Accueil</a></li>
+      <li><a href="../about.html">À propos</a></li>
+      <li><a href="../competences.html">Compétences</a></li>
+      <li><a href="../projets.html">Projets</a></li>
+      <li><a href="../veille.html">Veille techno</a></li>
+      <li><a href="../e4.html">Épreuve E4</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="breadcrumb">
+        <a href="../index.html">Accueil</a> <span>/</span>
+        <a href="../projets.html">Projets</a> <span>/</span>
+        <span>VLAN Cisco</span>
+      </div>
+      <div class="eyebrow">Situation professionnelle · Atelier pro</div>
+      <h1>Segmentation d'un réseau<br/>en 4 VLAN sur Cisco IOS.</h1>
+      <p style="max-width: 70ch; font-size: 1.05rem;">Conception et mise en œuvre sur Cisco Packet Tracer d'un réseau d'entreprise segmenté en 4 VLAN (Administration, Production, Invités, Voix), avec trunking 802.1Q, routage inter-VLAN et listes de contrôle d'accès (ACL).</p>
+
+      <div class="meta-row">
+        <div class="meta"><span class="meta-label">Durée</span><span class="meta-value">1 semaine</span></div><div class="meta"><span class="meta-label">Contexte</span><span class="meta-value">Atelier pro</span></div><div class="meta"><span class="meta-label">Environnement</span><span class="meta-value">Packet Tracer 8.2</span></div><div class="meta"><span class="meta-label">Bloc</span><span class="meta-value">Bloc 2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid" style="grid-template-columns: minmax(0,1fr) 280px; gap: 48px; align-items: start;">
+      <article class="prose reveal">
+        
+<h2>1. Contexte &amp; besoin</h2>
+<p>Une PME fictive de 60 postes connaît des problèmes de performance (broadcasts massifs) et de sécurité (tout le monde voit tout le monde). On me demande de <strong>segmenter</strong> le réseau pour&nbsp;:</p>
+<ul>
+  <li>Séparer les flux <strong>métier</strong> (admin, production) du réseau <strong>invité</strong> (Wi-Fi clients).</li>
+  <li>Isoler la <strong>téléphonie IP</strong> dans un VLAN dédié (QoS + sécurité).</li>
+  <li>Continuer à permettre le routage entre VLAN <em>uniquement quand c'est nécessaire</em>.</li>
+</ul>
+
+<h2>2. Plan d'adressage</h2>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>VLAN</th><th>Nom</th><th>Réseau</th><th>Passerelle</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>10</td><td>ADMIN</td><td>192.168.10.0/24</td><td>.1</td><td>Direction, IT</td></tr>
+      <tr><td>20</td><td>PROD</td><td>192.168.20.0/24</td><td>.1</td><td>Postes métier</td></tr>
+      <tr><td>30</td><td>GUEST</td><td>192.168.30.0/24</td><td>.1</td><td>Wi-Fi visiteurs</td></tr>
+      <tr><td>40</td><td>VOICE</td><td>192.168.40.0/24</td><td>.1</td><td>Téléphonie IP</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>3. Topologie</h2>
+
+<div class="ascii-schema">
+                    ┌──────────────┐
+                    │  Routeur R1  │  (Router-on-a-Stick)
+                    │  G0/0 trunk  │
+                    └──────┬───────┘
+                           │ 802.1Q
+                    ┌──────▼───────┐
+                    │  Switch SW1  │  (cœur, niveau 3 possible)
+                    └──┬─┬─┬─┬─┬───┘
+              ┌────────┘ │ │ │ └────────┐
+         Access│  Access │ │  Access    │Trunk
+         VLAN10│  VLAN20 │ │  VLAN30    │ ↓
+         PC01  │  PC10   │ │  WiFi AP   │  SW2
+               │         │ │            │
+               └─Access──┘ └─Access─────┘
+                VLAN40       VLAN40
+                (tél.)       (tél.)
+</div>
+
+<h2>4. Configuration Cisco (extraits)</h2>
+
+<h3>4.1 — Création des VLAN sur SW1</h3>
+
+<div class="code-block">
+<span class="p">SW1></span> enable
+<span class="p">SW1#</span> configure terminal
+<span class="p">SW1(config)#</span> vlan 10
+<span class="p">SW1(config-vlan)#</span> name ADMIN
+<span class="p">SW1(config-vlan)#</span> exit
+<span class="p">SW1(config)#</span> vlan 20
+<span class="p">SW1(config-vlan)#</span> name PROD
+<span class="p">SW1(config-vlan)#</span> exit
+<span class="p">SW1(config)#</span> vlan 30
+<span class="p">SW1(config-vlan)#</span> name GUEST
+<span class="p">SW1(config)#</span> vlan 40
+<span class="p">SW1(config-vlan)#</span> name VOICE
+</div>
+
+<h3>4.2 — Port d'accès avec téléphonie</h3>
+
+<div class="code-block">
+<span class="c">! Exemple : PC branché sur un téléphone, téléphone branché sur le switch</span>
+<span class="p">SW1(config)#</span> interface FastEthernet0/5
+<span class="p">SW1(config-if)#</span> switchport mode access
+<span class="p">SW1(config-if)#</span> switchport access vlan 20
+<span class="p">SW1(config-if)#</span> switchport voice vlan 40
+<span class="p">SW1(config-if)#</span> spanning-tree portfast
+</div>
+
+<h3>4.3 — Trunk entre switch et routeur</h3>
+
+<div class="code-block">
+<span class="p">SW1(config)#</span> interface GigabitEthernet0/1
+<span class="p">SW1(config-if)#</span> switchport mode trunk
+<span class="p">SW1(config-if)#</span> switchport trunk encapsulation dot1q
+<span class="p">SW1(config-if)#</span> switchport trunk allowed vlan 10,20,30,40
+</div>
+
+<h3>4.4 — Router-on-a-Stick sur R1</h3>
+
+<div class="code-block">
+<span class="p">R1(config)#</span> interface GigabitEthernet0/0
+<span class="p">R1(config-if)#</span> no shutdown
+
+<span class="p">R1(config-if)#</span> interface GigabitEthernet0/0.10
+<span class="p">R1(config-subif)#</span> encapsulation dot1Q 10
+<span class="p">R1(config-subif)#</span> ip address 192.168.10.1 255.255.255.0
+
+<span class="p">R1(config-subif)#</span> interface GigabitEthernet0/0.20
+<span class="p">R1(config-subif)#</span> encapsulation dot1Q 20
+<span class="p">R1(config-subif)#</span> ip address 192.168.20.1 255.255.255.0
+
+<span class="c">! idem pour VLAN 30 et 40</span>
+</div>
+
+<h2>5. ACL (isolation du VLAN invité)</h2>
+
+<p>Les invités doivent accéder à Internet, mais <strong>pas</strong> au réseau interne. Je crée une ACL étendue sur la sous-interface VLAN 30&nbsp;:</p>
+
+<div class="code-block">
+<span class="p">R1(config)#</span> ip access-list extended GUEST-ACL
+<span class="p">R1(config-ext-nacl)#</span> deny   ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+<span class="p">R1(config-ext-nacl)#</span> deny   ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+<span class="p">R1(config-ext-nacl)#</span> deny   ip 192.168.30.0 0.0.0.255 192.168.40.0 0.0.0.255
+<span class="p">R1(config-ext-nacl)#</span> permit ip any any
+<span class="p">R1(config-ext-nacl)#</span> exit
+
+<span class="p">R1(config)#</span> interface G0/0.30
+<span class="p">R1(config-subif)#</span> ip access-group GUEST-ACL in
+</div>
+
+<h2>6. Tests</h2>
+<ul>
+  <li><code>ping</code> PC-admin → PC-prod : OK (routage inter-VLAN fonctionne).</li>
+  <li><code>ping</code> PC-guest → PC-admin : bloqué par l'ACL ✔</li>
+  <li><code>ping</code> PC-guest → 8.8.8.8 (Internet) : OK ✔</li>
+  <li><code>show interface trunk</code> → le trunk porte bien les VLAN 10, 20, 30, 40.</li>
+</ul>
+
+<div class="note-box">
+  <strong>Apprentissage clé</strong> — le <em>router-on-a-stick</em> est la manière la plus économique d'apprendre le routage inter-VLAN. En production, un switch de niveau 3 serait préféré pour éviter le goulet d'étranglement sur un seul lien.
+</div>
+
+<h2>7. Compétences BTS</h2>
+<div class="cc-map">
+  <div class="cc-chip"><span class="num">B2.1</span><span>Concevoir une solution d'infrastructure</span></div>
+  <div class="cc-chip"><span class="num">B2.2</span><span>Installer, tester et déployer</span></div>
+  <div class="cc-chip"><span class="num">B2.3</span><span>Exploiter, dépanner, administrer</span></div>
+</div>
+
+
+        <div class="btn-row mt-4">
+          <a href="pfsense.html" class="btn btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Projet précédent
+          </a><a href="../projets.html" class="btn btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Tous les projets</a><a href="supervision-zabbix.html" class="btn btn-primary">
+            Projet suivant : Zabbix
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <aside class="reveal">
+        <div class="card" style="position: sticky; top: 100px;">
+          <h4 style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-dim); margin: 0 0 14px;">Fiche projet</h4>
+<dl style="display: grid; gap: 14px; margin: 0; font-size: 0.92rem;">
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Technos</dt>
+    <dd style="margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px;"><span class="tag">Cisco IOS</span><span class="tag">Packet Tracer 8.2</span><span class="tag">802.1Q</span><span class="tag">ACL</span><span class="tag">Router-on-a-Stick</span></dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Livrables</dt>
+    <dd style="margin: 4px 0 0;">
+      <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.8;"><li>Fichier .pkt du projet</li><li>Plan d'adressage</li><li>Configuration R1 + SW1</li><li>Tableau de tests</li></ul>
+    </dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Compétences</dt>
+    <dd style="margin: 4px 0 0; color: var(--text); font-size: 0.9rem;">B2.1 · B2.2 · B2.3</dd>
+  </div>
+</dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;"><span class="brand-mark">DC</span><span>Dimitri C.</span></div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio BTS SIO SISR · E4 & E6. Session 2026.</p>
+      </div>
+      <div><h4>Navigation</h4><ul>
+        <li><a href="../about.html">À propos</a></li>
+        <li><a href="../competences.html">Compétences</a></li>
+        <li><a href="../projets.html">Projets</a></li>
+        <li><a href="../veille.html">Veille</a></li>
+      </ul></div>
+      <div><h4>Ressources</h4><ul>
+        <li><a href="../e4.html">Tableau de synthèse E4</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Dimitri C.</span><span>BTS SIO SISR · Session 2026</span></div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>

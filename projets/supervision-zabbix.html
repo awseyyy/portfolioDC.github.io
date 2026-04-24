@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Supervision Zabbix — Dimitri C. | BTS SIO SISR</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2338BDF8'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-family='monospace' font-weight='700' font-size='28' fill='%230B1120'%3EDC%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand"><span class="brand-mark">DC</span><span>Dimitri C. — SISR</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Accueil</a></li>
+      <li><a href="../about.html">À propos</a></li>
+      <li><a href="../competences.html">Compétences</a></li>
+      <li><a href="../projets.html">Projets</a></li>
+      <li><a href="../veille.html">Veille techno</a></li>
+      <li><a href="../e4.html">Épreuve E4</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <div class="reveal">
+      <div class="breadcrumb">
+        <a href="../index.html">Accueil</a> <span>/</span>
+        <a href="../projets.html">Projets</a> <span>/</span>
+        <span>Supervision Zabbix</span>
+      </div>
+      <div class="eyebrow">Situation professionnelle · Stage 2</div>
+      <h1>Mise en production d'un serveur<br/>de supervision Zabbix.</h1>
+      <p style="max-width: 70ch; font-size: 1.05rem;">Déploiement d'un serveur Zabbix 6 LTS sur Debian 12 pour superviser 40+ équipements (serveurs Windows/Linux, switchs SNMP, onduleurs) avec alertes e-mail et tableaux de bord temps réel.</p>
+
+      <div class="meta-row">
+        <div class="meta"><span class="meta-label">Durée</span><span class="meta-value">1 semaine (stage)</span></div><div class="meta"><span class="meta-label">Contexte</span><span class="meta-value">Stage 2</span></div><div class="meta"><span class="meta-label">Environnement</span><span class="meta-value">Debian 12 · Zabbix 6 LTS</span></div><div class="meta"><span class="meta-label">Bloc</span><span class="meta-value">Bloc 1 · Bloc 2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid" style="grid-template-columns: minmax(0,1fr) 280px; gap: 48px; align-items: start;">
+      <article class="prose reveal">
+        
+<h2>1. Contexte &amp; besoin</h2>
+<p>Pendant mon stage chez <strong>InfraCloud Solutions</strong>, j'ai participé à la mise en place d'une supervision centralisée. Jusqu'alors, les incidents étaient remontés <em>par les utilisateurs</em>&nbsp;: un serveur plantait, personne ne le voyait avant 9h le lendemain. L'objectif&nbsp;:</p>
+<ul>
+  <li>Surveiller en <strong>temps réel</strong> l'état des serveurs, switchs et onduleurs critiques.</li>
+  <li>Déclencher une <strong>alerte e-mail</strong> dès qu'une métrique dépasse un seuil.</li>
+  <li>Constituer un <strong>historique</strong> de performance pour justifier les prochains investissements matériels.</li>
+</ul>
+
+<h2>2. Pourquoi Zabbix&nbsp;?</h2>
+<p>Comparaison rapide avant choix&nbsp;:</p>
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Solution</th><th>Licence</th><th>Agent</th><th>UI</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Nagios Core</td><td>GPL</td><td>NRPE</td><td>dépassée</td><td>OK mais daté</td></tr>
+      <tr><td>Centreon</td><td>Open-core</td><td>NRPE</td><td>moderne</td><td>Complexité ↑</td></tr>
+      <tr><td><strong>Zabbix</strong></td><td>GPL</td><td>natif</td><td>moderne</td><td>★ choisi</td></tr>
+      <tr><td>PRTG</td><td>propriétaire</td><td>—</td><td>—</td><td>Coût licence</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>3. Installation du serveur Zabbix</h2>
+
+<p>Sur une VM Debian 12 fraîchement installée&nbsp;:</p>
+
+<div class="code-block">
+<span class="c"># 1. Ajout du dépôt officiel Zabbix 6 LTS</span>
+<span class="p">$</span> wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5%2Bdebian12_all.deb
+<span class="p">$</span> sudo dpkg -i zabbix-release_6.0-5+debian12_all.deb
+<span class="p">$</span> sudo apt update
+
+<span class="c"># 2. Installation du serveur, frontend, agent, pilote MySQL</span>
+<span class="p">$</span> sudo apt install zabbix-server-mysql zabbix-frontend-php \
+     zabbix-apache-conf zabbix-sql-scripts zabbix-agent -y
+
+<span class="c"># 3. Création de la base</span>
+<span class="p">$</span> sudo mysql -uroot -p
+<span class="k">mysql></span> create database zabbix character set utf8mb4 collate utf8mb4_bin;
+<span class="k">mysql></span> create user 'zabbix'@'localhost' identified by 'MotDePasseFort!';
+<span class="k">mysql></span> grant all privileges on zabbix.* to 'zabbix'@'localhost';
+<span class="k">mysql></span> set global log_bin_trust_function_creators = 1;
+
+<span class="c"># 4. Import du schéma</span>
+<span class="p">$</span> zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p zabbix
+
+<span class="c"># 5. Mot de passe BDD dans /etc/zabbix/zabbix_server.conf, puis :</span>
+<span class="p">$</span> sudo systemctl restart zabbix-server zabbix-agent apache2
+<span class="p">$</span> sudo systemctl enable  zabbix-server zabbix-agent apache2
+</div>
+
+<p>L'interface est accessible sur <code>http://&lt;ip-serveur&gt;/zabbix</code>. Compte par défaut&nbsp;: <code>Admin / zabbix</code> (à changer immédiatement).</p>
+
+<h2>4. Ajout des hôtes supervisés</h2>
+
+<h3>4.1 — Agent Zabbix sur un serveur Linux</h3>
+
+<div class="code-block">
+<span class="p">$</span> sudo apt install zabbix-agent -y
+<span class="p">$</span> sudo nano /etc/zabbix/zabbix_agentd.conf
+<span class="c">    Server=192.168.50.10         (IP du serveur Zabbix)
+    ServerActive=192.168.50.10
+    Hostname=WEB01</span>
+<span class="p">$</span> sudo systemctl restart zabbix-agent
+</div>
+
+<p>Puis dans l'UI&nbsp;: <em>Configuration → Hosts → Create host</em> → lier le template <code>Linux by Zabbix agent</code>.</p>
+
+<h3>4.2 — Supervision SNMP d'un switch Cisco</h3>
+
+<p>Sur le switch&nbsp;: <code>snmp-server community techno-ro RO</code>.<br/>
+Dans Zabbix, j'ajoute l'hôte avec l'interface SNMP, la bonne communauté, et je lie le template <code>Cisco IOS SNMP</code>. Les métriques utiles&nbsp;: trafic par port, statut UP/DOWN, température, charge CPU.</p>
+
+<h2>5. Déclencheurs &amp; alertes</h2>
+
+<p>J'ai créé quelques <em>triggers</em> métier importants&nbsp;:</p>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Hôte</th><th>Condition</th><th>Sévérité</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>DC01</td><td>Service AD inactif ≥ 2 min</td><td style="color:var(--danger);">Désastre</td><td>Mail + SMS</td></tr>
+      <tr><td>WEB01</td><td>Filesystem / &gt; 85%</td><td style="color:var(--accent-warm);">Élevée</td><td>Mail</td></tr>
+      <tr><td>SW-CORE</td><td>Port trunk DOWN</td><td style="color:var(--danger);">Désastre</td><td>Mail + SMS</td></tr>
+      <tr><td>Tous</td><td>Ping loss &gt; 30%</td><td style="color:var(--accent-warm);">Élevée</td><td>Mail</td></tr>
+      <tr><td>Onduleur</td><td>Batterie &lt; 20%</td><td style="color:var(--danger);">Désastre</td><td>Mail + SMS</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>6. Tableau de bord</h2>
+<p>J'ai créé un dashboard <em>"NOC TechnoServices"</em> avec&nbsp;:</p>
+<ul>
+  <li>Map réseau cliquable (hôtes colorés selon sévérité).</li>
+  <li>Top 10 des hôtes en charge CPU.</li>
+  <li>Graphe de trafic des liens WAN.</li>
+  <li>Tableau des 24 dernières alertes.</li>
+</ul>
+
+<div class="note-box">
+  <strong>Astuce stage</strong> — j'ai affiché ce dashboard sur un écran mural du bureau technique. Les collègues m'ont dit que ça avait <em>changé la dynamique de l'équipe</em>&nbsp;: on est passés de «&nbsp;réactif sur réclamation&nbsp;» à «&nbsp;proactif sur incident&nbsp;».
+</div>
+
+<h2>7. Compétences BTS</h2>
+<div class="cc-map">
+  <div class="cc-chip"><span class="num">B1.1</span><span>Continuité d'un service informatique</span></div>
+  <div class="cc-chip"><span class="num">B1.5</span><span>Mettre à disposition un service</span></div>
+  <div class="cc-chip"><span class="num">B2.3</span><span>Exploiter, superviser et améliorer un SI</span></div>
+</div>
+
+<h2>8. Bilan</h2>
+<p>Ce projet m'a appris qu'<em>on ne supervise pas ce qu'on ne comprend pas</em>&nbsp;: avant de créer un déclencheur, il faut savoir quelle métrique mesurer et quel seuil est réaliste. Zabbix est puissant mais vite noyé sous les alertes si on en met trop&nbsp;: j'ai dû faire un vrai travail de tri pour garder uniquement les alertes <em>actionnables</em>.</p>
+
+
+        <div class="btn-row mt-4">
+          <a href="vlan-cisco.html" class="btn btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Projet précédent
+          </a><a href="../projets.html" class="btn btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Tous les projets</a><a href="glpi.html" class="btn btn-primary">
+            Projet suivant : GLPI
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </article>
+
+      <aside class="reveal">
+        <div class="card" style="position: sticky; top: 100px;">
+          <h4 style="font-family: var(--font-mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-dim); margin: 0 0 14px;">Fiche projet</h4>
+<dl style="display: grid; gap: 14px; margin: 0; font-size: 0.92rem;">
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Technos</dt>
+    <dd style="margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px;"><span class="tag">Zabbix 6 LTS</span><span class="tag">Debian 12</span><span class="tag">MariaDB</span><span class="tag">SNMP</span><span class="tag">Apache</span></dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Livrables</dt>
+    <dd style="margin: 4px 0 0;">
+      <ul style="padding-left: 18px; margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.8;"><li>Procédure d'installation</li><li>Liste des templates liés</li><li>Tableau des triggers</li><li>Captures dashboards</li></ul>
+    </dd>
+  </div>
+  <div>
+    <dt class="text-muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: .08em;">Compétences</dt>
+    <dd style="margin: 4px 0 0; color: var(--text); font-size: 0.9rem;">B1.1 · B1.5 · B2.3</dd>
+  </div>
+</dl>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom: 14px;"><span class="brand-mark">DC</span><span>Dimitri C.</span></div>
+        <p class="text-muted" style="font-size: 0.9rem;">Portfolio BTS SIO SISR · E4 & E6. Session 2026.</p>
+      </div>
+      <div><h4>Navigation</h4><ul>
+        <li><a href="../about.html">À propos</a></li>
+        <li><a href="../competences.html">Compétences</a></li>
+        <li><a href="../projets.html">Projets</a></li>
+        <li><a href="../veille.html">Veille</a></li>
+      </ul></div>
+      <div><h4>Ressources</h4><ul>
+        <li><a href="../e4.html">Tableau de synthèse E4</a></li>
+        <li><a href="../contact.html">Contact</a></li>
+      </ul></div>
+    </div>
+    <div class="copy"><span>© 2026 Dimitri C.</span><span>BTS SIO SISR · Session 2026</span></div>
+  </div>
+</footer>
+<script src="../js/main.js"></script>
+</body>
+</html>
